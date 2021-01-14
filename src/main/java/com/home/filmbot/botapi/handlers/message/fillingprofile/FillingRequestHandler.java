@@ -1,7 +1,7 @@
-package com.home.filmbot.botapi.handlers.fillingprofile;
+package com.home.filmbot.botapi.handlers.message.fillingprofile;
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.InputMessageHandler;
+import com.home.filmbot.botapi.handlers.message.InputMessageHandler;
 import com.home.filmbot.ceche.UserDataCache;
 import com.home.filmbot.service.ReplyMessagesService;
 import lombok.extern.slf4j.Slf4j;

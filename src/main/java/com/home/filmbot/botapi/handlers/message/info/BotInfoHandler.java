@@ -1,8 +1,8 @@
-package com.home.filmbot.botapi.handlers.askmovie;
+package com.home.filmbot.botapi.handlers.message.info;
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.InputMessageHandler;
-import com.home.filmbot.ceche.UserDataCache;
+import com.home.filmbot.botapi.handlers.message.InputMessageHandler;
+import com.home.filmbot.service.KeyboardMarkupService;
 import com.home.filmbot.service.ReplyMessagesService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,13 +14,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Slf4j
 @Component
 public class BotInfoHandler implements InputMessageHandler {
-    private final UserDataCache userDataCache;
     private final ReplyMessagesService messagesService;
+    private final KeyboardMarkupService markupService;
 
-    public BotInfoHandler(UserDataCache userDataCache,
-                          ReplyMessagesService messagesService) {
+    public BotInfoHandler(KeyboardMarkupService markupService, ReplyMessagesService messagesService) {
     this.messagesService = messagesService;
-    this.userDataCache = userDataCache;
+    this.markupService = markupService;
     }
 
     @Override
@@ -29,11 +28,11 @@ public class BotInfoHandler implements InputMessageHandler {
     }
 
     private SendMessage processUsersInput(Message inputMsg) {
-        int userId = inputMsg.getFrom().getId();
         long chatId = inputMsg.getChatId();
 
         SendMessage replyToUser = messagesService.getReplyMessage(chatId, "reply.botInfo");
-        userDataCache.setUserCurrentBotState(userId, BotState.ASK_MOVIE);
+        replyToUser.setReplyMarkup(markupService.getInlineMessageButtons(getHandlerName()));
+
         return replyToUser;
     }
 

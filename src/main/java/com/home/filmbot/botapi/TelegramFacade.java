@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -22,6 +23,13 @@ public class TelegramFacade {
     public BotApiMethod<?> handleUpdate(Update update) {
         SendMessage replyToUser = null;
 
+        if (update.hasCallbackQuery()){
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            log.info("New callbackQuery from user: {}, userId: {}, with data: {}", update.getCallbackQuery().getFrom().getUserName(), update.getCallbackQuery().getFrom().getId(), update.getCallbackQuery().getData());
+
+            return  handleCallbackQuery(callbackQuery);
+        }
+
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
             log.info("New message from user: {}, chatId: {}, with text: {}",
@@ -30,6 +38,12 @@ public class TelegramFacade {
         }
 
         return replyToUser;
+    }
+
+    private BotApiMethod<?> handleCallbackQuery(CallbackQuery callbackQuery) {
+        int userId = callbackQuery.getFrom().getId();
+        BotState botState = userDataCache.getUserCurrentBotState(userId);
+        return botStateContext.processCallbackQuery(botState, callbackQuery);
     }
 
     private SendMessage handleInputMessage(Message message) {

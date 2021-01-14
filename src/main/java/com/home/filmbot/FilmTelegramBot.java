@@ -20,7 +20,8 @@ public class FilmTelegramBot extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return telegramFacade.handleUpdate(update);
+        final BotApiMethod<?> replyToUser = telegramFacade.handleUpdate(update);
+        return replyToUser;
 
     }
 

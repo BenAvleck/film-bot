@@ -1,4 +1,4 @@
-package com.home.filmbot.botapi.handlers.fillingprofile;
+package com.home.filmbot.botapi.handlers.message.fillingprofile;
 
 import lombok.AccessLevel;
 import lombok.Data;
