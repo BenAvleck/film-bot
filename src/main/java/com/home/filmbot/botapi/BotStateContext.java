@@ -38,7 +38,6 @@ public class BotStateContext {
                     SEARCH_SERIALS,
                     SEARCH_CARTOONS,
                     SEARCH_ANIME,
-                    CINEMA_DIRECTION,
                     ASK_GENRE -> true;
             default -> false;
         };
