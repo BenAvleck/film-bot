@@ -1,4 +1,4 @@
-package com.home.filmbot.botapi.handlers.message;
+package com.home.filmbot.botapi.handlers;
 
 
 import com.home.filmbot.botapi.BotState;

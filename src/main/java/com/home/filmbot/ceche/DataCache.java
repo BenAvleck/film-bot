@@ -1,7 +1,7 @@
 package com.home.filmbot.ceche;
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.handlers.message.fillingprofile.UserRequestData;
+import com.home.filmbot.botapi.handlers.moviesearch.UserRequestData;
 
 
 public interface DataCache {

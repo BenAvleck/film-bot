@@ -1,4 +1,4 @@
-package com.home.filmbot.botapi.handlers.message.fillingprofile;
+package com.home.filmbot.botapi.handlers.moviesearch;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -8,8 +8,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequestData {
     String movieName;
-    String genre;
-    String actor;
-    int year;
 
 }

@@ -1,6 +1,6 @@
 package com.home.filmbot.controller;
 
-import com.home.filmbot.FilmTelegramBot;
+import com.home.filmbot.botapi.FilmTelegramBot;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

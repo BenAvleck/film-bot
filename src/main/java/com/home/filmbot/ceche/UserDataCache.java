@@ -2,7 +2,7 @@ package com.home.filmbot.ceche;
 
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.handlers.message.fillingprofile.UserRequestData;
+import com.home.filmbot.botapi.handlers.moviesearch.UserRequestData;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class UserDataCache implements DataCache {
     public BotState getUserCurrentBotState(int userId) {
         BotState botState = usersBotStates.get(userId);
         if (botState == null) {
-            botState = BotState.ASK_MOVIE;
+            botState = BotState.SEARCH_MOVIE;
         }
 
         return botState;

@@ -1,7 +1,8 @@
-package com.home.filmbot.botapi.handlers.message.fillingprofile;
+package com.home.filmbot.botapi.handlers.moviesearch;
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.handlers.message.InputMessageHandler;
+import com.home.filmbot.botapi.handlers.InputMessageHandler;
+
 import com.home.filmbot.ceche.UserDataCache;
 import com.home.filmbot.service.ReplyMessagesService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +24,8 @@ public class FillingRequestHandler implements InputMessageHandler {
 
     @Override
     public SendMessage handle(Message message) {
-        if (userDataCache.getUserCurrentBotState(message.getFrom().getId()).equals(BotState.FILLING_REQUEST)) {
-            userDataCache.setUserCurrentBotState(message.getFrom().getId(), BotState.ASK_MOVIE);
+        if (userDataCache.getUserCurrentBotState(message.getFrom().getId()).equals(BotState.MOVIE_SEARCH_START)) {
+            userDataCache.setUserCurrentBotState(message.getFrom().getId(), BotState.CINEMA_DIRECTION);
         }
         return processUsersInput(message);
     }
@@ -39,15 +40,15 @@ public class FillingRequestHandler implements InputMessageHandler {
 
         SendMessage replyToUser = null;
 
-        if (botState.equals(BotState.ASK_MOVIE)) {
+        if (botState.equals(BotState.CINEMA_DIRECTION)) {
             replyToUser = messagesService.getReplyMessage(chatId, "reply.askMovie");
-            userDataCache.setUserCurrentBotState(userId, BotState.MOVIE_REPLY);
+            userDataCache.setUserCurrentBotState(userId, BotState.ASK_GENRE);
         }
         return replyToUser;
     }
 
     @Override
     public BotState getHandlerName() {
-        return BotState.FILLING_REQUEST;
+        return BotState.MOVIE_SEARCH_START;
     }
 }

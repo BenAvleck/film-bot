@@ -1,10 +1,16 @@
 package com.home.filmbot.botapi;
 
 public enum BotState {
-    BOT_INFO,
-    FILLING_REQUEST,
-    ASK_MOVIE,
-    MOVIE_REPLY,
-    SHOW_HELP_MENU
+    SEARCH_MOVIE,
+    MOVIE_SEARCH_START,
+    SEARCH_FILMS,
+    SEARCH_SERIALS,
+    SEARCH_CARTOONS,
+    SEARCH_ANIME,
+    CINEMA_DIRECTION,
+    ASK_GENRE,
+    SHOW_MAIN_MENU,
+    FAVORITES,
+
 
 }

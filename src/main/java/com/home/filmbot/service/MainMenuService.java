@@ -26,13 +26,13 @@ public class MainMenuService {
 
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
-        KeyboardRow row3 = new KeyboardRow();
-        row1.add(new KeyboardButton("Поиск фильма по названию"));
-        row2.add(new KeyboardButton("Поиск по другим параметрам"));
-        row3.add(new KeyboardButton("Помощь"));
+        row1.add(new KeyboardButton("Фильмы"));
+        row1.add(new KeyboardButton("Сериалы"));
+        row1.add(new KeyboardButton("Мультфильмы"));
+        row1.add(new KeyboardButton("Аниме"));
+        row2.add(new KeyboardButton("Избранные"));
         keyboard.add(row1);
         keyboard.add(row2);
-        keyboard.add(row3);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }

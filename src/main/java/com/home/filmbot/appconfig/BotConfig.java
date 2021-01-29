@@ -1,10 +1,8 @@
 package com.home.filmbot.appconfig;
 
-import com.home.filmbot.FilmTelegramBot;
+import com.home.filmbot.botapi.FilmTelegramBot;
 import com.home.filmbot.botapi.TelegramFacade;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.home.filmbot.botconfig.FilmTelegramBotConfig;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,23 +10,24 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 
-@Getter
-@Setter
 @Configuration
-@ConfigurationProperties(prefix = "telegrambot")
 public class BotConfig {
-    private String webHookPath;
-    private String botUserName;
-    private String botToken;
+
+    private FilmTelegramBotConfig botConfig;
+
+    public BotConfig(FilmTelegramBotConfig botConfig) {
+        this.botConfig = botConfig;
+    }
 
     @Bean
     public FilmTelegramBot filmTelegramBot(TelegramFacade telegramFacade) {
+
         DefaultBotOptions options = ApiContext.getInstance(DefaultBotOptions.class);
 
         FilmTelegramBot filmTelegramBot = new FilmTelegramBot(options, telegramFacade);
-        filmTelegramBot.setWebHookPath(webHookPath);
-        filmTelegramBot.setBotToken(botToken);
-        filmTelegramBot.setBotUserName(botUserName);
+        filmTelegramBot.setBotPath(botConfig.getWebHookPath());
+        filmTelegramBot.setBotToken(botConfig.getBotToken());
+        filmTelegramBot.setBotUsername(botConfig.getUserName());
 
         return filmTelegramBot;
     }
