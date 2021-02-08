@@ -13,8 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Slf4j
 @Component
 public class MainMenuHandler implements InputMessageHandler {
-    ReplyMessagesService messagesService;
-    MainMenuService menuService;
+    private final ReplyMessagesService messagesService;
+    private final MainMenuService menuService;
 
     public MainMenuHandler(ReplyMessagesService messagesService, MainMenuService menuService) {
         this.messagesService = messagesService;
@@ -23,12 +23,20 @@ public class MainMenuHandler implements InputMessageHandler {
 
     @Override
     public SendMessage handle(Message message) {
-        return message.getText().equals("/start")? menuService.getMainMenuMessage(message.getChatId(),
-                messagesService.getReplyText("reply.mainMenu.welcomeMessage",
-                        Emojis.BLUSH,Emojis.OK_HAND,Emojis.HELP_MENU_WELCOME)):
-                menuService.getMainMenuMessage(message.getChatId(),
-                        messagesService.getEmojiReplyText("reply.helpMenu.welcomeMessage",
-                                Emojis.HELP_MENU_WELCOME));
+        long chatId = message.getChatId();
+
+        if(message.getText().equals("/start")) {
+              return  menuService.getMainMenuMessage(chatId, messagesService.getReplyText("reply.mainMenu.welcomeMessage", Emojis.BLUSH, Emojis.OK_HAND, Emojis.HELP_MENU_WELCOME));
+        }
+        else if(message.getText().equals("/help")) {
+            return menuService.getMainMenuMessage(chatId,
+                    messagesService.getEmojiReplyText("reply.helpMenu.welcomeMessage",
+                            Emojis.HELP_MENU_WELCOME));
+        }
+        else{
+            return menuService.getMainMenuMessage(chatId, messagesService.getReplyText("reply.showMainMenu"));
+        }
+
     }
 
     @Override

@@ -8,8 +8,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-@Component
 @Slf4j
+@Component
 public class TelegramFacade {
     private BotStateContext botStateContext;
     private UserDataCache userDataCache;
@@ -49,16 +49,15 @@ public class TelegramFacade {
         BotState botState;
         SendMessage replyMessage;
 
-        botState = switch (inputMsg) {
-            case "/start", "/help" -> BotState.SHOW_MAIN_MENU;
-            case "Фильмы" -> BotState.SEARCH_FILMS;
-            case "Сериалы" -> BotState.SEARCH_SERIALS;
-            case "Мультфильмы" -> BotState.SEARCH_CARTOONS;
-            case "Аниме" -> BotState.SEARCH_ANIME;
-            case "Избранное" -> BotState.FAVORITES;
-            default -> userDataCache.getUserCurrentBotState(userId);
-        };
-
+            botState = switch (inputMsg) {
+                case "/help", "/start", "Назад" -> BotState.SHOW_MAIN_MENU;
+                case "Фильмы", "Случайные фильмы", "Жанры фильмов", "Назад к фильмам" -> BotState.SEARCH_FILMS;
+                case "Сериалы", "Случайные сериалы", "Жанры сериалов", "Назад к сериалам" -> BotState.SEARCH_SERIALS;
+                case "Мультфильмы","Случайные мультфильмы", "Жанры мультфильмов", "Назад к мультфильмам" -> BotState.SEARCH_CARTOONS;
+                case "Аниме", "Случайные аниме","Жанры аниме", "Назад к аниме" -> BotState.SEARCH_ANIME;
+                case "Избранное" -> BotState.FAVORITES;
+                default -> BotState.SEARCH_MOVIE; /*userDataCache.getUserCurrentBotState(userId);*/
+            };
         userDataCache.setUserCurrentBotState(userId, botState);
 
         replyMessage = botStateContext.processInputMessage(botState, message);

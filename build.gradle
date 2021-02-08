@@ -29,6 +29,9 @@ dependencies {
 //	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '2.3.8.RELEASE'
 	//endregion
 
+	// jsoup HTML parser library @ https://jsoup.org/
+	implementation 'org.jsoup:jsoup:1.13.1'
+
 	//region DB
 /*
 	compile group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '2.2.0'
