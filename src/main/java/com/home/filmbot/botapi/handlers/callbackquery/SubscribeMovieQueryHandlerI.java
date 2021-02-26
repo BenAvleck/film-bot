@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 * */
 
 @Component
-public class SubscribeMovieQueryHandler implements CallbackQueryHandler{
+public class SubscribeMovieQueryHandlerI implements ICallbackQueryHandler {
     @Override
     public SendMessage handleCallbackQuery(CallbackQuery callbackQuery) {
         return null;

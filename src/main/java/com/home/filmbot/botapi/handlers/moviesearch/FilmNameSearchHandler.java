@@ -3,53 +3,71 @@ package com.home.filmbot.botapi.handlers.moviesearch;
 import com.home.filmbot.botapi.BotState;
 import com.home.filmbot.botapi.FilmTelegramBot;
 import com.home.filmbot.botapi.handlers.InputMessageHandler;
+import com.home.filmbot.service.FilmsDataService;
 import com.home.filmbot.service.ReplyMessagesService;
+import com.home.filmbot.utils.Emojis;
 import lombok.SneakyThrows;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 /*Обработчик запросов фильма по названию*/
+
+@Slf4j
 @Component
 public class FilmNameSearchHandler implements InputMessageHandler {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(FilmNameSearchHandler.class);
     private String filmSearchTemplate;
     private final ReplyMessagesService messagesService;
     private final FilmTelegramBot telegramBot;
+    private final FilmsDataService filmsDataService;
+    private final DeleteMessage deleteMessage = new DeleteMessage();
 
-    public FilmNameSearchHandler( ReplyMessagesService messagesService, @Lazy FilmTelegramBot telegramBot) {
+    public FilmNameSearchHandler(FilmsDataService filmsDataService, ReplyMessagesService messagesService, @Lazy FilmTelegramBot telegramBot) {
         this.messagesService = messagesService;
         this.telegramBot = telegramBot;
+        this.filmsDataService = filmsDataService;
+
     }
     @SneakyThrows
     @Override
     public SendMessage handle(Message message) {
-        filmSearchTemplate = messagesService.getReplyText("url.search.filter", message.getText());
         long chatId = message.getChatId();
+        String messageText = message.getText();
+        filmSearchTemplate = messagesService.getReplyText("url.search.filter", message.getText());
+        SendMessage replyMessage;
+        String replyText;
+//        telegramBot.sendMessage(messagesService.getReplyMessage(chatId, "reply.movieResponse"));
 
-        telegramBot.sendMessage(messagesService.getReplyMessage(chatId, "reply.movieResponse"));
 
+        filmsDataService.setFilmList(filmSearchTemplate);
 
-            Document doc  = Jsoup.connect(filmSearchTemplate)
-                    .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                    .referrer("http://www.google.com")
-                    .get();
+        if (filmsDataService.getSize()==0)
+            return messagesService.getReplyMessage(chatId,"reply.notFound", Emojis.NOTIFICATION_MARK_FAILED, messageText);
 
-            Elements listName = doc.select("div.b-content__inline_item-link");
-            for(Element element : listName){
-                System.out.println(element.select("a").text() + " ["+element.select("div").text() + "] \n"+ element.select("a").first().absUrl("href"));
+        replyText = messagesService.getReplyText("reply.movieResponse.name", messageText);
+        replyMessage = new SendMessage()
+                .enableMarkdown(true)
+                .setChatId(chatId);
 
-                telegramBot.sendMessage(chatId,(element.select("a").text() + " ["+element.select("div").last().text() + "] \n"+ element.select("a").first().absUrl("href")));
-            }
+        replyText+= filmsDataService.getFilmList(0);
+        replyMessage.setText(replyText);
+        replyMessage.setReplyMarkup(filmsDataService.getInlineMessageButtons(0));
 
-        return null;
+        return replyMessage;
     }
+
+
+
+/*    private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callbackquery) {
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery.setCallbackQueryId(callbackquery.getId());
+        answerCallbackQuery.setShowAlert(alert);
+        answerCallbackQuery.setText(text);
+        return answerCallbackQuery;
+    }*/
 
 
     @Override
@@ -57,3 +75,4 @@ public class FilmNameSearchHandler implements InputMessageHandler {
         return BotState.SEARCH_MOVIE;
     }
 }
+

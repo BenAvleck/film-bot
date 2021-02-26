@@ -25,21 +25,6 @@ public class BotStateContext {
     }
 
     private InputMessageHandler findMessageHandler(BotState currentState) {
-        if (isFillingRequestState(currentState)){
-            return messageHandlers.get(BotState.MOVIE_SEARCH_START);
-        }
         return messageHandlers.get(currentState);
-    }
-
-    private boolean isFillingRequestState(BotState currentState) {
-        return switch (currentState) {
-            case  MOVIE_SEARCH_START,
-                    SEARCH_FILMS,
-                    SEARCH_SERIALS,
-                    SEARCH_CARTOONS,
-                    SEARCH_ANIME,
-                    ASK_GENRE -> true;
-            default -> false;
-        };
     }
 }

@@ -16,13 +16,26 @@ public enum Emojis {
     NOTIFICATION_MARK_FAILED(EmojiParser.parseToUnicode(":exclamation:")),
     SUCCESS_UNSUBSCRIBED(EmojiParser.parseToUnicode(":negative_squared_cross_mark:")),
     SUCCESS_SUBSCRIBED(EmojiParser.parseToUnicode(":mailbox:")),
-    NOTIFICATION_BELL(EmojiParser.parseToUnicode(":bell:")),
+    FAIL(EmojiParser.parseToUnicode(":x:")),
     NOTIFICATION_INFO_MARK(EmojiParser.parseToUnicode(":information_source:")),
     NOTIFICATION_PRICE_UP(EmojiParser.parseToUnicode(":chart_with_upwards_trend:")),
     NOTIFICATION_PRICE_DOWN(EmojiParser.parseToUnicode(":chart_with_downwards_trend:")),
     HELP_MENU_WELCOME(EmojiParser.parseToUnicode(":hatched_chick:")),
-    BLUSH(EmojiParser.parseToUnicode(":blush:"));
-
+    BLUSH(EmojiParser.parseToUnicode(":blush:")),
+    STAR(EmojiParser.parseToUnicode(":star:")),
+    ARTIST(EmojiParser.parseToUnicode(":man_artist:")),
+    HOURGLASS(EmojiParser.parseToUnicode(":hourglass_flowing_sand:")),
+    DANCER(EmojiParser.parseToUnicode(":dancer:")),
+    PEN(EmojiParser.parseToUnicode(":lower_left_fountain_pen:")),
+    EYES(EmojiParser.parseToUnicode(":eyes:")),
+    ONE(EmojiParser.parseToUnicode(":one:")),
+    TWO(EmojiParser.parseToUnicode(":two:")),
+    THREE(EmojiParser.parseToUnicode(":three:")),
+    FOUR(EmojiParser.parseToUnicode(":four:")),
+    FIVE(EmojiParser.parseToUnicode(":five:")),
+    POINT_DOWN(EmojiParser.parseToUnicode(":point_down:")),
+    BACK(EmojiParser.parseToUnicode(":arrow_left:")),
+    NEXT(EmojiParser.parseToUnicode(":arrow_right:"));
     private String emojiName;
 
     @Override

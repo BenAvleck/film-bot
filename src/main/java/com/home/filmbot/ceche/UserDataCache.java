@@ -2,7 +2,7 @@ package com.home.filmbot.ceche;
 
 
 import com.home.filmbot.botapi.BotState;
-import com.home.filmbot.botapi.handlers.moviesearch.UserRequestData;
+import com.home.filmbot.botapi.handlers.moviesearch.FilmRequestData;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
 @Component
 public class UserDataCache implements DataCache {
     private final Map<Integer, BotState> usersBotStates = new HashMap<>();
-    private final Map<Integer, UserRequestData> usersRequestData = new HashMap<>();
+    private final Map<Integer, FilmRequestData> usersRequestData = new HashMap<>();
 
     @Override
     public void setUserCurrentBotState(int userId, BotState botState) {
@@ -28,15 +28,15 @@ public class UserDataCache implements DataCache {
         return botState;
     }
     @Override
-    public void setUserRequestData(int userId, UserRequestData userRequestData){
-        usersRequestData.put(userId, userRequestData);
+    public void setUserRequestData(int userId, FilmRequestData filmRequestData){
+        usersRequestData.put(userId, filmRequestData);
     }
 
     @Override
-    public UserRequestData getUserRequestData(int userId) {
-        UserRequestData userRequestData = usersRequestData.get(userId);
-        if(userRequestData == null){ userRequestData = new UserRequestData();}
-    return userRequestData;
+    public FilmRequestData getUserRequestData(int userId) {
+        FilmRequestData filmRequestData = usersRequestData.get(userId);
+        if(filmRequestData == null){ filmRequestData = new FilmRequestData();}
+    return filmRequestData;
     }
 
 }
