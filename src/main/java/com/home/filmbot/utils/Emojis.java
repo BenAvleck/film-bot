@@ -35,7 +35,16 @@ public enum Emojis {
     FIVE(EmojiParser.parseToUnicode(":five:")),
     POINT_DOWN(EmojiParser.parseToUnicode(":point_down:")),
     BACK(EmojiParser.parseToUnicode(":arrow_left:")),
-    NEXT(EmojiParser.parseToUnicode(":arrow_right:"));
+    NEXT(EmojiParser.parseToUnicode(":arrow_right:")),
+    CLAPPER(EmojiParser.parseToUnicode(":clapper:")),
+    DATE(EmojiParser.parseToUnicode(":date:")),
+    WHITE_FLAG(EmojiParser.parseToUnicode(":waving_white_flag:")),
+    FRAMES(EmojiParser.parseToUnicode(":film_frames")),
+    TROPHY(EmojiParser.parseToUnicode(":trophy")),
+    PUSHPIN(EmojiParser.parseToUnicode(":round_pushpin")),
+    MEMO(EmojiParser.parseToUnicode(":memo:")),
+    RELAXED(EmojiParser.parseToUnicode(":relaxed:"));
+
     private String emojiName;
 
     @Override

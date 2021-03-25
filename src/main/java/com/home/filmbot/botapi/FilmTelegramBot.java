@@ -55,6 +55,13 @@ public class FilmTelegramBot extends TelegramWebhookBot {
             e.printStackTrace();
         }
     }
+    public void sendAnswerCallbackQuery(AnswerCallbackQuery answer){
+        try {
+            execute(answer);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
     public void sendPhoto(SendPhoto sendPhoto) {
         try {
             execute(sendPhoto);

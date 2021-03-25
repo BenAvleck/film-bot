@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -16,14 +15,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Component
-public class FilmInfoQueryHandler implements ICallbackQueryHandler{
+public class MaxInfoQueryHandler implements ICallbackQueryHandler{
     private final FilmsDataService filmsDataService;
     private final ReplyMessagesService messagesService;
     private final FilmTelegramBot telegramBot;
 
-    public FilmInfoQueryHandler(FilmsDataService filmsDataService, ReplyMessagesService messagesService,@Lazy FilmTelegramBot telegramBot) {
+    public MaxInfoQueryHandler(FilmsDataService filmsDataService, ReplyMessagesService messagesService,@Lazy FilmTelegramBot telegramBot) {
         this.filmsDataService = filmsDataService;
         this.messagesService = messagesService;
         this.telegramBot = telegramBot;
@@ -36,8 +34,7 @@ public class FilmInfoQueryHandler implements ICallbackQueryHandler{
         long message_id = callbackQuery.getMessage().getMessageId();
         String call_data = callbackQuery.getData();
         long chatId = callbackQuery.getMessage().getChatId();
-        final int index; /*Integer.parseInt(callbackQuery.getData().split("\\|")[1]);*/
-        String answer = messagesService.getReplyText("reply.movieResponse");
+        final int index = Integer.parseInt(callbackQuery.getData().split("\\|")[2]);;
 
         EditMessageText callBackAnswer = new EditMessageText()
                 .setChatId(chatId)
@@ -45,42 +42,33 @@ public class FilmInfoQueryHandler implements ICallbackQueryHandler{
                 .setMessageId(Math.toIntExact(message_id))
                 /*.enableWebPagePreview()*/;
 
+        if(call_data.split("\\|")[1].equals("detail")){
+            callBackAnswer.setText(filmsDataService.getFilmMaxInfo(index))
+                    .setReplyMarkup(getInlineMessageButtonsForMaxFilm(index, "detail"));
+            telegramBot.sendAnswerCallbackQuery(sendAnswerCallbackQuery("Подробнее",false, callbackId));
+        }
+        else
+        {
+            callBackAnswer.setText(filmsDataService.getFilmShortInfo(index))
+                    .setReplyMarkup(getInlineMessageButtonsForMaxFilm(index, "briefly"));
+            telegramBot.sendAnswerCallbackQuery(sendAnswerCallbackQuery("Коротко",false, callbackId));
+        }
 
-        if(call_data.split("\\|")[1].equals("next")){
-            index = Integer.parseInt(callbackQuery.getData().split("\\|")[2])+5;
-            answer += filmsDataService.getFilmList(index);
-            callBackAnswer.setText( answer);
-            callBackAnswer.setReplyMarkup(filmsDataService.getInlineMessageButtonsForList(index));
-            telegramBot.sendAnswerCallbackQuery(sendAnswerCallbackQuery("Updated",false, callbackId));
-        }
-        else if(call_data.split("\\|")[1].equals("back")){
-            index = Integer.parseInt(callbackQuery.getData().split("\\|")[2])-5;
-            answer += filmsDataService.getFilmList(index);
-            callBackAnswer.setText(answer);
-            callBackAnswer.setReplyMarkup(filmsDataService.getInlineMessageButtonsForList(index));
-            telegramBot.sendAnswerCallbackQuery(sendAnswerCallbackQuery("Updated",false, callbackId));
-        }
-        else {
-            index = Integer.parseInt(callbackQuery.getData().split("\\|")[1]);
-            return  new  SendMessage()
-                    .setChatId(chatId)
-                    /*.enableWebPagePreview()*/
-                    .enableHtml(true)
-                    .setText( filmsDataService.getFilmShortInfo(index))
-                    .setReplyMarkup(getInlineMessageButtonsForShortFilm(index));
-        }
         return callBackAnswer;
     }
-
-    public InlineKeyboardMarkup getInlineMessageButtonsForShortFilm(int index){
+    public InlineKeyboardMarkup getInlineMessageButtonsForMaxFilm(int index, String button){
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Подробнее").setCallbackData("INFO|detail|"+index));
-
+        if(button.equals("detail")) {
+            keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Коротко").setCallbackData("INFO|briefly|" + index));
+        }
+        else{
+            keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Подробнее").setCallbackData("INFO|detail|" + index));
+        }
         List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
         keyboardButtonsRow2.add(new InlineKeyboardButton().setText("Добавить в избранное").setCallbackData("SUBSCRIBE|" + index));
-
+        keyboardButtonsRow2.add(new InlineKeyboardButton().setText("Смотреть онлайн").setCallbackData("WATCH|" + index));
 
 
 
@@ -94,8 +82,7 @@ public class FilmInfoQueryHandler implements ICallbackQueryHandler{
     }
 
 
-
-        private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, String callbackQueryId) {
+    private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, String callbackQueryId) {
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery.setCallbackQueryId(callbackQueryId);
         answerCallbackQuery.setShowAlert(alert);
@@ -105,6 +92,6 @@ public class FilmInfoQueryHandler implements ICallbackQueryHandler{
 
     @Override
     public CallbackQueryType getHandlerQueryType() {
-        return CallbackQueryType.FILMS;
+        return CallbackQueryType.INFO;
     }
 }

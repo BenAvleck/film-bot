@@ -3,7 +3,6 @@ package com.home.filmbot.service;
 import com.home.filmbot.botapi.FilmTelegramBot;
 import com.home.filmbot.botapi.handlers.moviesearch.FilmRequestData;
 import com.home.filmbot.utils.Emojis;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Getter
 @Service
 public class FilmsDataService {
     private final ReplyMessagesService messagesService;
@@ -51,42 +49,41 @@ public class FilmsDataService {
             filmRequestData.setMovieName(element.select("a").text());
             filmRequestData.setYear(element.select("div").last().text().split(", ")[0]);
             filmRequestData.setCountry(element.select("div").last().text().split(", ")[1]);
-            filmRequestData.setGenre(element.select("div").last().text().split(", ")[2]);
+            filmRequestData.setMainGenre(element.select("div").last().text().split(", ")[2]);
             filmRequestData.setUrl(element.select("a").first().absUrl("href"));
 
             filmList.add(filmRequestData);
         }
     }
 
-    public void setCurrentFilm(int index){
-        if(index <= size-1){
-            currentFilm = filmList.get(index);
-        }
-    }
+    public String getFilmMaxInfo(int index){
+        currentFilm = filmList.get(index);
 
-    public String getFullCurrentFilmImfo(){
-        String filmInfoMessage = "";
-        filmInfoMessage += messagesService.getReplyText("reply.template.filmResponse"
-                ,currentFilm.getMovieName()
-                ,currentFilm.getUrl()
-                ,currentFilm.getYear()
-                ,currentFilm.getCountry()
-                ,currentFilm.getGenre());
-        filmInfoMessage+=""+currentFilm.getRate()+"\n\n";
+        if (currentFilm.getActors()== null){setAllVariables();}
+
+        String filmInfoMessage ="<b>" +Emojis.CLAPPER + currentFilm.getMovieName()+"</b>\n"
+                +"<i>"+currentFilm.getEnglishTitle()+"</i>\n\n";
+
+        if(currentFilm.getRate()!=null){filmInfoMessage+=currentFilm.getRate()+"\n\n";}
         if(currentFilm.getTagline()!=null){filmInfoMessage+=currentFilm.getTagline()+"\n\n";}
-        filmInfoMessage+=currentFilm.getDuration()+"\n\n";
+        if(currentFilm.getReleaseDate()!=null){filmInfoMessage+=Emojis.DATE+currentFilm.getReleaseDate()+"\n\n";}
+        if(currentFilm.getDuration()!=null) {filmInfoMessage+=currentFilm.getDuration()+"\n\n";}
         if(currentFilm.getAge()!=null){filmInfoMessage+=currentFilm.getAge()+"\n\n";}
-        filmInfoMessage+=currentFilm.getActors();
-        filmInfoMessage+=
-        filmInfoMessage+="[.]("+currentFilm.getImgUrl()+")";
+        if(currentFilm.getCountry()!=null){filmInfoMessage+="<b>Cтрана</b>"+Emojis.WHITE_FLAG+currentFilm.getCountry()+"\n\n";}
+        if(currentFilm.getGenres()!=null){filmInfoMessage+=Emojis.FRAMES+ currentFilm.getGenres()+"\n\n";}
+        if(currentFilm.getDirector()!=null){filmInfoMessage+=currentFilm.getDirector()+"\n\n";}
+        if(currentFilm.getActors()!=null){filmInfoMessage+=currentFilm.getActors()+"\n\n";}
+        if(currentFilm.getNominations()!=null){filmInfoMessage+=Emojis.TROPHY + currentFilm.getNominations()+"\n\n";}
+        if(currentFilm.getSeries()!=null){filmInfoMessage+=Emojis.PUSHPIN+ currentFilm.getSeries()+"\n\n";}
+        if(currentFilm.getDescription()!=null){filmInfoMessage+=Emojis.MEMO + currentFilm.getDescription();}
+        filmInfoMessage+="<a href=\""+currentFilm.getImgUrl()+"\">&#8204;</a>";
 
         return filmInfoMessage;
+
     }
 
     @SneakyThrows
-    public String setFilmInfo(int index){
-        currentFilm = filmList.get(index);
-        String filmInfoMessage = "";
+    private void setAllVariables() {
 
         Document doc  = Jsoup.connect(currentFilm.getUrl())
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -94,63 +91,66 @@ public class FilmsDataService {
                 .get();
         Elements filmInfo = doc.select("#main > div.b-container.b-wrapper > div > div.b-content__columns.pdt.clearfix > div.b-content__main");
         Elements postInfotableRight = filmInfo.select(" div.b-post__infotable.clearfix > div.b-post__infotable_right > div > table > tbody > tr");
-        Elements postInfotableLeft = filmInfo.select("div.b-post__infotable.clearfix > div.b-post__infotable_left > div > a");
-        Elements postDescriptintTitle = filmInfo.select("div.b-post__description");
         List<String> infoList = postInfotableRight.eachText();
-
 
 
         for(String info : infoList){
             String[] mark = info.split(" : ",2);
-            if(mark[0].equals("Рейтинги"))
-                currentFilm.setRate(Emojis.STAR+"*"+mark[0]+"* : "+ (mark[1].split("\\)", 2)[0])+")    "+(mark[1].split("\\)", 2)[1]) );
-            else if (mark[0].equals("Слоган"))
-                currentFilm.setTagline(Emojis.PEN+"*"+mark[0]+"* : "+mark[1]);
-            else if (mark[0].equals("Дата выхода"))
-                currentFilm.setReleaseDate(mark[1]);
-            else if (mark[0].equals("Режиссер"))
-                currentFilm.setDirector(Emojis.ARTIST+"*"+mark[0]+"* : "+mark[1]);
-            else if (mark[0].equals("Возраст"))
-                currentFilm.setAge(Emojis.EYES+"*"+mark[0]+"* : "+mark[1]);
-            else if (mark[0].equals("Время"))
-                currentFilm.setDuration(Emojis.HOURGLASS+"*"+mark[0]+"* : "+mark[1]);
-            else if (mark[0].equals("В ролях актеры"))
-                currentFilm.setActors(Emojis.DANCER+"*"+mark[0]+"* : "+mark[1]);
+            switch (mark[0]) {
+                case "Рейтинги" -> currentFilm.setRate(Emojis.STAR + "<b>" + mark[0] + "</b> : " + (mark[1].split("\\)", 2)[0]) + ")    " + (mark[1].split("\\)", 2)[1]));
+                case "Входит в списки" -> currentFilm.setNominations("<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Слоган" -> currentFilm.setTagline(Emojis.PEN + "<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Дата выхода" -> currentFilm.setReleaseDate("<b>" + mark[0] + "</b> : " +mark[1]);
+                case "Режиссер" -> currentFilm.setDirector(Emojis.ARTIST + "<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Жанр" -> currentFilm.setGenres("<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Возраст" -> currentFilm.setAge(Emojis.EYES + "<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Время" -> currentFilm.setDuration(Emojis.HOURGLASS + "<b>" + mark[0] + "</b> : " + mark[1]);
+                case "Из серии" -> currentFilm.setSeries("<b>" + mark[0] + "</b> : " + mark[1]);
+                case "В ролях актеры" -> currentFilm.setActors(Emojis.DANCER + "<b>" + mark[0] + "</b> : " + mark[1]);
+            }
         }
-        currentFilm.setDescription(postDescriptintTitle.eachText().get(0));
-        currentFilm.setImgUrl(postInfotableLeft.attr("href"));
+        currentFilm.setDescription(filmInfo.select("div.b-post__description").eachText().get(0));
+        currentFilm.setImgUrl(filmInfo.select("div.b-post__infotable.clearfix > div.b-post__infotable_left > div > a").attr("href"));
         currentFilm.setEnglishTitle(filmInfo.select("div.b-post__origtitle").text());
+    }
 
-        filmInfoMessage += messagesService.getReplyText("reply.template.filmResponse"
-                ,currentFilm.getMovieName()
+    public String getFilmShortInfo(int index){
+        currentFilm = filmList.get(index);
+
+        if(currentFilm.getActors()==null){
+            setAllVariables();
+        }
+
+        String filmInfoMessage = messagesService.getReplyText("reply.template.filmResponse"
                 ,currentFilm.getUrl()
+                ,currentFilm.getMovieName()
                 ,currentFilm.getYear()
                 ,currentFilm.getCountry()
-                ,currentFilm.getGenre());
+                ,currentFilm.getMainGenre());
         filmInfoMessage+=""+currentFilm.getRate()+"\n\n";
         if(currentFilm.getTagline()!=null){filmInfoMessage+=currentFilm.getTagline()+"\n\n";}
-        filmInfoMessage+=currentFilm.getDuration()+"\n\n";
+        if(currentFilm.getDuration()!=null) {filmInfoMessage+=currentFilm.getDuration()+"\n\n";}
         if(currentFilm.getAge()!=null){filmInfoMessage+=currentFilm.getAge()+"\n\n";}
         filmInfoMessage+=currentFilm.getActors();
-        filmInfoMessage+="[.]("+currentFilm.getImgUrl()+")";
-
+        filmInfoMessage+="<a href=\"jf+"+currentFilm.getImgUrl()+"\">&#8204;</a>";
         return filmInfoMessage;
+
     }
 
     public String getFilmList(int index){
-        String replyText = "";
+        StringBuilder replyText = new StringBuilder();
         for(int i = index, n = 1; i < size && i < index + 5; n++, i++) {
-            replyText += messagesService.getReplyText("reply.template.filmsRequest", n
-                    ,getMovieName(i)
-                    ,getURL(i)
-                    ,getYear(i)
-                    ,getCountry(i)
-                    ,getGenre(i));
+            replyText.append(messagesService.getReplyText("reply.template.filmsRequest", n
+                    , getURL(i)
+                    , getMovieName(i)
+                    , getYear(i)
+                    , getCountry(i)
+                    , getMainGenre(i)));
         }
-        return replyText;
+        return replyText.toString();
     }
 
-    public InlineKeyboardMarkup getInlineMessageButtons(int index){
+    public InlineKeyboardMarkup getInlineMessageButtonsForList(int index){
         int count = size-index;
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -158,15 +158,15 @@ public class FilmsDataService {
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
         int n = index;
         for (int i = 0; i < count && i<5 ; i++){
-            keyboardButtonsRow1.add(new InlineKeyboardButton().setText(getEmoji(i).toString()).setCallbackData("FILM_INFO|"+ n++));
+            keyboardButtonsRow1.add(new InlineKeyboardButton().setText(getEmoji(i).toString()).setCallbackData("FILMS|"+ n++));//Заменить handler не FILM_INFO, a film list
         }
 
         List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
         if(index != 0) {
-            keyboardButtonsRow2.add(new InlineKeyboardButton().setText(Emojis.BACK.toString()).setCallbackData("FILM_INFO|back|" + index));
+            keyboardButtonsRow2.add(new InlineKeyboardButton().setText(Emojis.BACK.toString()).setCallbackData("FILMS|back|" + index)); //Заменить handler не FILM
         }
         if(count > 6) {
-            keyboardButtonsRow2.add(new InlineKeyboardButton().setText(Emojis.NEXT.toString()).setCallbackData("FILM_INFO|next|"+index));
+            keyboardButtonsRow2.add(new InlineKeyboardButton().setText(Emojis.NEXT.toString()).setCallbackData("FILMS|next|"+index));
         }
 
 
@@ -191,7 +191,6 @@ public class FilmsDataService {
     }
 
 
-
     public String getMovieName(int index){
         return filmList.get(index).getMovieName();
     }
@@ -204,6 +203,9 @@ public class FilmsDataService {
     public String getRate(int index) {
         return filmList.get(index).getRate();
     }
+    public String getNominations(int index) {
+        return filmList.get(index).getNominations();
+    }
     public String getReleaseDate(int index){
         return filmList.get(index).getReleaseDate();
     }
@@ -214,26 +216,43 @@ public class FilmsDataService {
         return filmList.get(index).getDirector();
     }
     public String getTagline(int index){ return filmList.get(index).getTagline(); }
-    public String getGenre(int index){
-        return filmList.get(index).getGenre();
+    public String getMainGenre(int index){
+        return filmList.get(index).getMainGenre();
     }
-    public String getAge(int index){
-        return filmList.get(index).getAge();
+    public String getGenres(int index){
+        return filmList.get(index).getGenres();
     }
-    public String getDuration(int index){
-        return filmList.get(index).getDuration();
-    }
-    public String getActors(int index){
-        return filmList.get(index).getActors();
-    }
-    public String getDescription(int index){
-        return filmList.get(index).getDescription();
-    }
-    public String getTorrents(int index){
-        return filmList.get(index).getTorrent();
-    }
+    public String getAge(int index){ return filmList.get(index).getAge(); }
+    public String getDuration(int index){return filmList.get(index).getDuration(); }
+    public String getActors(int index){return filmList.get(index).getActors(); }
+    public String getDescription(int index){return filmList.get(index).getDescription(); }
+    public String getTorrents(int index){return filmList.get(index).getTorrent(); }
     public String getImgUrl(int index){ return filmList.get(index).getImgUrl(); }
     public String getYear(int index){ return filmList.get(index).getYear(); }
+    public String getSeries(int index){ return filmList.get(index).getSeries(); }
 
+    public ReplyMessagesService getMessagesService() {
+        return this.messagesService;
+    }
+
+    public List<FilmRequestData> getFilmList() {
+        return this.filmList;
+    }
+    public void setCurrentFilm(int index) {
+        currentFilm = filmList.get(index);
+        setAllVariables();
+    }
+
+    public FilmRequestData getCurrentFilm() {
+        return this.currentFilm;
+    }
+
+    public FilmTelegramBot getTelegramBot() {
+        return this.telegramBot;
+    }
+
+    public int getSize() {
+        return this.size;
+    }
 }
 

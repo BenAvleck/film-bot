@@ -49,25 +49,15 @@ public class FilmNameSearchHandler implements InputMessageHandler {
 
         replyText = messagesService.getReplyText("reply.movieResponse.name", messageText);
         replyMessage = new SendMessage()
-                .enableMarkdown(true)
+                .enableHtml(true)
                 .setChatId(chatId);
 
         replyText+= filmsDataService.getFilmList(0);
         replyMessage.setText(replyText);
-        replyMessage.setReplyMarkup(filmsDataService.getInlineMessageButtons(0));
+        replyMessage.setReplyMarkup(filmsDataService.getInlineMessageButtonsForList(0));
 
         return replyMessage;
     }
-
-
-
-/*    private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callbackquery) {
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery.setCallbackQueryId(callbackquery.getId());
-        answerCallbackQuery.setShowAlert(alert);
-        answerCallbackQuery.setText(text);
-        return answerCallbackQuery;
-    }*/
 
 
     @Override

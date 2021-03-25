@@ -1,4 +1,4 @@
-package com.home.filmbot.ceche;
+package com.home.filmbot.cache;
 
 import com.home.filmbot.botapi.BotState;
 import com.home.filmbot.botapi.handlers.moviesearch.FilmRequestData;
